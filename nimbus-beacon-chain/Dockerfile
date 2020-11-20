@@ -1,5 +1,5 @@
 ARG BEACON_BASE
-FROM stereum/beacon-base:${BEACON_BASE} as builder
+FROM alpine:3.12 as builder
 LABEL maintainer="theguys@stereum.net"
 ARG RELEASE
 RUN : "${RELEASE:?Build argument needs to be set and non-empty.}"
@@ -10,7 +10,7 @@ WORKDIR /tmp/build/nimbus
 RUN git checkout tags/${RELEASE} -b releasebuild
 RUN make -j4
 
-FROM stereum/beacon-base:${BEACON_BASE} as dist
+FROM alpine:3.12 as dist
 RUN apk add bash libgcc
 ARG SERVICE_USER
 ARG SERVICE_HOME
