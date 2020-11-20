@@ -29,15 +29,6 @@ USER ${SERVICE_USER}
 ENV WEB3_URL=https://goerli.prylabs.net
 ENTRYPOINT ["/opt/app/run-pyrmont-beacon-node.sh"]
 
-# do security scan
-FROM dist as scanned
-LABEL maintainer="theguys@stereum.net"
-USER root
-RUN apk add curl \
-    && curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin \
-    && trivy filesystem --exit-code 1 --no-progress -o /tmp/trivy-scanresult.txt /
-USER ${SERVICE_USER}
-
 # harden image
 FROM dist as hardened
 LABEL maintainer="theguys@stereum.net"
