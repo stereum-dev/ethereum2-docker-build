@@ -26,4 +26,4 @@ RUN adduser -h ${SERVICE_HOME} -s /sbin/nologin -u 2000 -D ${SERVICE_USER} && \
   chown -R ${SERVICE_USER}:${SERVICE_USER} ${SERVICE_HOME}
 RUN chmod +x ${SERVICE_HOME}/scripts/run-beacon-node.sh
 USER ${SERVICE_USER}
-ENTRYPOINT ["${SERVICE_HOME}/scripts/run-beacon-node.sh"]
+ENTRYPOINT ["/opt/app/scripts/run-beacon-node.sh"]
