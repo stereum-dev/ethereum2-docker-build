@@ -1,4 +1,5 @@
-FROM alpine as builder
+ARG BEACON_BASE
+FROM stereum/beacon-base:${BEACON_BASE} as builder
 LABEL maintainer="theguys@stereum.net"
 ARG RELEASE
 RUN : "${RELEASE:?Build argument needs to be set and non-empty.}"
@@ -9,7 +10,7 @@ WORKDIR /tmp/build/nimbus
 RUN git checkout tags/${RELEASE} -b releasebuild
 RUN make -j4
 
-FROM alpine as dist
+FROM stereum/beacon-base:${BEACON_BASE} as dist
 RUN apk add bash libgcc
 ARG SERVICE_USER
 ARG SERVICE_HOME
@@ -21,18 +22,8 @@ COPY --from=builder /tmp/build/nimbus/build build
 COPY --from=builder /tmp/build/nimbus/scripts scripts
 COPY --from=builder /tmp/build/nimbus/*.sh ./
 # create user
-RUN \
-  mkdir -p ${SERVICE_HOME} && \
-  adduser -h ${SERVICE_HOME} -s /sbin/nologin -u 2000 -D ${SERVICE_USER} && \
+RUN adduser -h ${SERVICE_HOME} -s /sbin/nologin -u 2000 -D ${SERVICE_USER} && \
   chown -R ${SERVICE_USER}:${SERVICE_USER} ${SERVICE_HOME}
+RUN chmod +x ${SERVICE_HOME}/scripts/run-beacon-node.sh
 USER ${SERVICE_USER}
-ENV WEB3_URL=https://goerli.prylabs.net
-ENTRYPOINT ["/opt/app/run-pyrmont-beacon-node.sh"]
-
-# harden image
-FROM dist as hardened
-LABEL maintainer="theguys@stereum.net"
-USER root
-RUN rm -f /sbin/apk && rm -rf /etc/apk && rm -rf /lib/apk && rm -rf /usr/share/apk && rm -rf /var/lib/apk
-USER ${SERVICE_USER}
-WORKDIR ${SERVICE_HOME}
+ENTRYPOINT ["${SERVICE_HOME}/scripts/run-beacon-node.sh"]

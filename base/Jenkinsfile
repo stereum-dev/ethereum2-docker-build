@@ -1,0 +1,19 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                checkout scm
+                dir('base') { 
+                    sh 'docker build  --build-arg=BEACON_BASE=${BASE} -t stereum/beacon-base:${BASE} .'
+                    sh 'docker push stereum/beacon-base:${BASE}'
+                }
+            }
+        }        
+    }
+    post { 
+        always { 
+            cleanWs()
+        }
+    }
+}
