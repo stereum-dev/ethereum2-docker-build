@@ -1,5 +1,5 @@
 ARG BEACON_BASE
-FROM alpine:3.12 as builder
+FROM stereum/beacon-base:${BEACON_BASE} as builder
 LABEL maintainer="theguys@stereum.net"
 ARG RELEASE
 RUN : "${RELEASE:?Build argument needs to be set and non-empty.}"
@@ -10,7 +10,7 @@ WORKDIR /tmp/build/nimbus
 RUN git checkout tags/${RELEASE} -b releasebuild
 RUN make -j4
 
-FROM alpine:3.12 as dist
+FROM stereum/beacon-base:${BEACON_BASE} as dist
 RUN apk add bash libgcc
 ARG SERVICE_USER
 ARG SERVICE_HOME
@@ -20,7 +20,6 @@ WORKDIR ${SERVICE_HOME}
 # copy binaries
 COPY --from=builder /tmp/build/nimbus/build build
 COPY --from=builder /tmp/build/nimbus/scripts scripts
-COPY --from=builder /tmp/build/nimbus/*.sh ./
 # create user
 RUN adduser -h ${SERVICE_HOME} -s /sbin/nologin -u 2000 -D ${SERVICE_USER} && \
   chown -R ${SERVICE_USER}:${SERVICE_USER} ${SERVICE_HOME}
