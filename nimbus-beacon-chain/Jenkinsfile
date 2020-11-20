@@ -4,7 +4,9 @@ pipeline {
         stage('Build') {
             steps {
                 checkout scm
-                sh 'docker build -t stereum/nimbus-beacon-chain:${RELEASE} .'
+                dir('nimbus-beacon-chain') { 
+                    sh 'docker build --build-arg=RELEASE=${RELEASE} -t stereum/nimbus-beacon-chain:${RELEASE} .'
+                }
             }
         }
         stage('Push') {
