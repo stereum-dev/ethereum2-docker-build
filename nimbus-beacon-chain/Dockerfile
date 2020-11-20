@@ -19,7 +19,7 @@ WORKDIR ${SERVICE_HOME}
 # copy binaries
 COPY --from=builder /tmp/build/nimbus/build build
 COPY --from=builder /tmp/build/nimbus/scripts scripts
-COPY --from=builder /tmp/build/nimbus/*.sh .
+COPY --from=builder /tmp/build/nimbus/*.sh ./
 # create user
 RUN \
   mkdir -p ${SERVICE_HOME} && \
