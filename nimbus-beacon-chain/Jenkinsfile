@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                checkout scm
+                sh 'docker build -t stereum/nimbus-beacon-chain:${RELEASE} .'
+            }
+        }
+        stage('Push') {
+            steps {
+                sh 'docker push stereum/nimbus-beacon-chain:${RELEASE}'
+            }
+        }
+    }
+    post { 
+        always { 
+            cleanWs()
+        }
+    }
+}
