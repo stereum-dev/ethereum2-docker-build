@@ -3,8 +3,8 @@ pipeline {
     stages {        
         stage('Harden') {
             steps {
-                dir('base') { 
-                    sh 'docker build -f Dockerfile_harden --build-arg=BASE=${BASE} -t stereum/beacon-base:${BASE} .'
+                dir('base/hardening') { 
+                    sh 'docker build -f Dockerfile --build-arg=BASE=${BASE} -t stereum/beacon-base:${BASE} .'
                     sh "docker run --rm -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy --exit-code 1 --no-progress stereum/beacon-base:${BASE}"
                 }
             }
