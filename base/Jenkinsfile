@@ -13,19 +13,7 @@ pipeline {
             steps {                
                 sh 'docker push stereum/beacon-base:${BASE}-soft'
             }
-        }
-        stage('Harden') {
-            steps {
-                dir('base') { 
-                    sh 'docker build -f Dockerfile_harden --build-arg=BASE=${BASE} -t stereum/beacon-base:${BASE} .'                    
-                }
-            }
-        }
-        stage('Push Hardened') {
-            steps {                
-                sh 'docker push stereum/beacon-base:${BASE}'
-            }
-        }
+        }        
     }
     post { 
         always { 

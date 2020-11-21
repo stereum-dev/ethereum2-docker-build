@@ -13,21 +13,7 @@ pipeline {
             steps {                                
                 sh 'docker push stereum/nimbus-beacon-chain:${RELEASE}-soft'
             }
-        }
-        stage('Harden') {
-            steps {
-                dir('nimbus-beacon-chain') { 
-                    sh 'docker build -f Dockerfile_harden --build-arg=RELEASE=${RELEASE} -t stereum/nimbus-beacon-chain:${RELEASE} .'                    
-                }
-            }
-        }
-        stage('Push Hardened') {
-            steps {
-                dir('nimbus-beacon-chain') {                     
-                    sh 'docker push stereum/nimbus-beacon-chain:${RELEASE}'
-                }
-            }
-        }
+        }        
     }
     post { 
         always { 

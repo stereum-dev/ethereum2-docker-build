@@ -1,0 +1,23 @@
+pipeline {
+    agent any
+    stages {        
+        stage('Harden') {
+            steps {
+                dir('base') { 
+                    sh 'docker build -f Dockerfile_harden --build-arg=BASE=${BASE} -t stereum/beacon-base:${BASE} .'
+                    sh "docker run --rm -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy --exit-code 1 --no-progress stereum/beacon-base:${BASE}"
+                }
+            }
+        }
+        stage('Push Hardened') {
+            steps {                
+                sh 'docker push stereum/beacon-base:${BASE}'
+            }
+        }
+    }
+    post { 
+        always { 
+            cleanWs()
+        }
+    }
+}
