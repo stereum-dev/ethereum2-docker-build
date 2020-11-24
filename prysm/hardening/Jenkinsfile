@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+    stages {        
+        stage('Harden') {
+            steps {
+                parallel(
+                    "beacon-chain": {
+                        dir('prysm/hardening') { 
+                            sh 'docker build -f Dockerfile --target beacon-chain --build-arg=RELEASE=${RELEASE} -t stereum/prysm-beacon-chain:${RELEASE} .'
+                            sh "docker run --rm -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy --exit-code 0 --severity CRITICAL,HIGH,LOW --no-progress stereum/prysm-beacon-chain:${RELEASE}"
+                            sh "docker run --rm -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy --exit-code 8 --severity CRITICAL --no-progress stereum/prysm-beacon-chain:${RELEASE}"
+                        }
+                    },
+                    "validator":{
+                        dir('prysm/hardening') { 
+                            sh 'docker build -f Dockerfile --target slasher  --build-arg=RELEASE=${RELEASE} -t stereum/prysm-slasher:${RELEASE} .'
+                            sh "docker run --rm -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy --exit-code 0 --severity CRITICAL,HIGH,LOW --no-progress stereum/prysm-slasher:${RELEASE}"                            
+                            sh "docker run --rm -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy --exit-code 8 --severity CRITICAL --no-progress stereum/prysm-slasher:${RELEASE}"                            
+                        }
+                    },
+                    "slasher":{
+                        dir('prysm/hardening') { 
+                            sh 'docker build -f Dockerfile --target validator --build-arg=RELEASE=${RELEASE} -t stereum/prysm-valdiator:${RELEASE} .'
+                            sh "docker run --rm -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy --exit-code 0 --severity CRITICAL,HIGH,LOW --no-progress stereum/prysm-validator:${RELEASE}"
+                            sh "docker run --rm -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy --exit-code 8 --severity CRITICAL --no-progress stereum/prysm-validator:${RELEASE}"
+                        }
+                    }                    
+                )
+            }
+            
+        }
+        stage('Push Hardened') {
+            
+            steps {
+                parallel(
+                    "beacon-chain": {
+                        sh 'docker push stereum/prysm-beacon-chain:${RELEASE}'
+                    },
+                    "validator":{
+                        sh 'docker push stereum/prysm-validator:${RELEASE}'
+                    },
+                    "slasher":{
+                        sh 'docker push stereum/prysm-slasher:${RELEASE}'
+                    }                    
+                )                
+            }
+        }
+    }
+    post { 
+        always { 
+            cleanWs()
+        }
+    }
+}

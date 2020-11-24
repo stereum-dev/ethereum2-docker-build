@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                checkout scm
+                dir('prysm') {                     
+                    sh 'docker build -f Dockerfile --build-arg=RELEASE=${RELEASE} --target beacon-chain -t stereum/prysm-beacon-chain:${RELEASE}-soft .'                    
+                    sh 'docker build -f Dockerfile --build-arg=RELEASE=${RELEASE} --target slasher -t stereum/prysm-slasher:${RELEASE}-soft .'
+                    sh 'docker build -f Dockerfile --build-arg=RELEASE=${RELEASE} --target validator -t stereum/prysm-validstor:${RELEASE}-soft .'
+                }
+            }
+        }
+        stage('Push Soft') {
+            steps {                                
+                sh 'docker push stereum/prysm-beacon-chain:${RELEASE}-soft'                
+                sh 'docker push stereum/prysm-slasher:${RELEASE}-soft'
+                sh 'docker push stereum/prysm-validator:${RELEASE}-soft'
+            }
+        }        
+    }
+    post { 
+        always { 
+            cleanWs()
+        }
+    }
+}

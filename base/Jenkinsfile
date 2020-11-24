@@ -5,7 +5,8 @@ pipeline {
             steps {
                 checkout scm
                 dir('base') { 
-                    sh 'docker build  --build-arg=BASE=${BASE} -t stereum/beacon-base:${BASE}-soft .'
+                    // build base image
+                    sh 'docker build  --build-arg=BASE=${BASE} -t stereum/beacon-base:${BASE}-soft .'                    
                 }
             }
         }

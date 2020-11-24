@@ -1,12 +1,10 @@
 ARG  BASE
-FROM alpine:${BASE}
+FROM bitnami/minideb:${BASE} as builder
 LABEL maintainer="theguys@stereum.net"
 USER root
-# update known security issues in the specified alpine version
-#RUN apk add musl=1.1.24-r10 musl-utils=1.1.24-r10
-# do a security scan on the base image
-RUN apk add --no-cache curl \
-    && curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin \
-    && trivy filesystem --exit-code 0 --no-progress / > /scan_result.txt 2>&1 \
-    && rm /usr/local/bin/trivy \
-    && rm -rf /root/.cache/trivy
+RUN install_packages curl ca-certificates && \
+  curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/master/contrib/install.sh | sh -s -- -b /usr/local/bin && \
+  apt-get autoremove -y curl libldap-2.4 &&  \
+  trivy filesystem --exit-code 0 --no-progress / > /scan_result 2>&1 && \
+  rm /usr/local/bin/trivy && \
+  rm -rf /root/.cache/trivy  
