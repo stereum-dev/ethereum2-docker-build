@@ -11,13 +11,18 @@ pipeline {
                 }
             }
         }
-        stage('Push Soft') {
+        stage('Push') {
             steps {                                
                 sh 'docker push stereum/prysm-beacon-chain:${RELEASE}-soft'                
                 sh 'docker push stereum/prysm-slasher:${RELEASE}-soft'
                 sh 'docker push stereum/prysm-validator:${RELEASE}-soft'
             }
-        }        
+        }
+        stage('Hardening') {
+            steps {                                                
+                build job: 'prysm-harden', parameters: [[$class: 'StringParameterValue', name: 'RELEASE', value: RELEASE] ], propagate: false, wait: false
+            }
+        }
     }
     post { 
         always { 

@@ -9,11 +9,16 @@ pipeline {
                 }
             }
         }
-        stage('Push Soft') {
+        stage('Push') {
             steps {                                
                 sh 'docker push stereum/nimbus-beacon-chain:${RELEASE}-soft'
             }
-        }        
+        }
+        stage('Hardening') {
+            steps {                                                
+                build job: 'nimbus-beacon-chain-harden', parameters: [[$class: 'StringParameterValue', name: 'RELEASE', value: RELEASE] ], propagate: false, wait: false
+            }
+        }
     }
     post { 
         always { 
