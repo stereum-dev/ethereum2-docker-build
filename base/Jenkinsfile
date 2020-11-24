@@ -5,16 +5,20 @@ pipeline {
             steps {
                 checkout scm
                 dir('base') { 
-                    // build base image
                     sh 'docker build  --build-arg=BASE=${BASE} -t stereum/beacon-base:${BASE}-soft .'                    
                 }
             }
         }
-        stage('Push Soft') {
+        stage('Push') {
             steps {                
-                sh 'docker push stereum/beacon-base:${BASE}-soft'
+                sh 'docker push stereum/beacon-base:${BASE}-soft'                
             }
-        }        
+        }
+        stage('Hardening') {
+            steps {                                                
+                build job: 'beacon-base-harden', parameters: [[$class: 'StringParameterValue', name: 'BASE', value: BASE]], propagate: false, wait: false
+            }
+        }
     }
     post { 
         always { 
