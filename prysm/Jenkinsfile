@@ -5,9 +5,9 @@ pipeline {
             steps {
                 checkout scm
                 dir('prysm') {                     
-                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target beacon-chain -t stereum/prysm-beacon-chain:${RELEASE}-soft .'                    
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target beacon-chain -t stereum/prysm-beacon-chain:${RELEASE}-soft .'
                     sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target slasher -t stereum/prysm-slasher:${RELEASE}-soft .'
-                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target validator -t stereum/prysm-validstor:${RELEASE}-soft .'
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target validator -t stereum/prysm-validator:${RELEASE}-soft .'
                 }
             }
         }
