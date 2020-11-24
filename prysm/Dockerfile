@@ -5,11 +5,10 @@ LABEL maintainer="theguys@stereum.net"
 ARG RELEASE
 RUN : "${RELEASE:?Build argument needs to be set and non-empty.}"
 WORKDIR /tmp/build
-RUN install_packages wget ca-certificates bash && \
-  wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/beacon-chain-v1.0.0-beta.3-linux-amd64 -O beacon-chain
-#  wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/beacon-chain-v1.0.0-beta.3-linux-amd64 -O beacon-chain && \
-#  wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/slasher-v1.0.0-beta.3-linux-amd64 -O slasher && \
-#  wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/validator-v1.0.0-beta.3-linux-amd64 -O validator
+RUN install_packages wget ca-certificates bash && \  
+  wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/beacon-chain-v1.0.0-beta.3-linux-amd64 -O beacon-chain && \
+  wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/slasher-v1.0.0-beta.3-linux-amd64 -O slasher && \
+  wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/validator-v1.0.0-beta.3-linux-amd64 -O validator
 
 FROM stereum/beacon-base:${BEACON_BASE} as beacon-chain
 RUN install_packages bash
