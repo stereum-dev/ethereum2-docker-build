@@ -10,7 +10,7 @@ WORKDIR /tmp/build/nimbus
 RUN git checkout tags/${RELEASE} -b releasebuild
 RUN make -j4
 
-FROM stereum/beacon-base:${BEACON_BASE} as soft-beacon-chain
+FROM stereum/beacon-base:${BEACON_BASE} as soft-nimbus
 RUN install_packages bash
 ARG SERVICE_USER
 ARG SERVICE_HOME

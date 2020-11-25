@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                checkout scm
+                dir('nimbus') { 
+                    sh 'docker build --build-arg=RELEASE=${RELEASE} --build-arg=BEACON_BASE=${BASE} -t stereum/nimbus:${RELEASE}-soft .'                    
+                }
+            }
+        }
+        stage('Push') {
+            steps {                                
+                sh 'docker push stereum/nimbus:${RELEASE}-soft'
+            }
+        }
+        stage('Hardening') {
+            steps {                                                
+                build job: 'nimbus-harden', parameters: [[$class: 'StringParameterValue', name: 'RELEASE', value: RELEASE] ], propagate: false, wait: false
+            }
+        }
+    }
+    post { 
+        always { 
+            cleanWs()
+        }
+    }
+}

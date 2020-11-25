@@ -1,5 +1,5 @@
 ARG  RELEASE
-FROM stereum/nimbus-beacon-chain:${RELEASE}-soft as hardened
+FROM stereum/nimbus:${RELEASE}-soft as hardened
 LABEL maintainer="theguys@stereum.net"
 USER root
 # harden image
