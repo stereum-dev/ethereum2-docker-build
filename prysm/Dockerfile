@@ -5,8 +5,7 @@ LABEL maintainer="theguys@stereum.net"
 ARG RELEASE
 RUN : "${RELEASE:?Build argument needs to be set and non-empty.}"
 WORKDIR /tmp/build
-RUN install_packages wget ca-certificates bash && \  
-          
+RUN install_packages wget bash && \  
   wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/beacon-chain-${RELEASE}-linux-amd64 -O beacon-chain && \
   wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/slasher-${RELEASE}-linux-amd64 -O slasher && \
   wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/validator-${RELEASE}-linux-amd64 -O validator
