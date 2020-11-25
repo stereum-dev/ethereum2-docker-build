@@ -6,9 +6,10 @@ ARG RELEASE
 RUN : "${RELEASE:?Build argument needs to be set and non-empty.}"
 WORKDIR /tmp/build
 RUN install_packages wget ca-certificates bash && \  
+          
   wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/beacon-chain-${RELEASE}-linux-amd64 -O beacon-chain && \
   wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/slasher-${RELEASE}-linux-amd64 -O slasher && \
-  wget -q https://github.com/prysmaticlabs/prysm/releases/download/validator-${RELEASE}-linux-amd64 -O validator
+  wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/validator-${RELEASE}-linux-amd64 -O validator
 
 FROM stereum/beacon-base:${BEACON_BASE} as beacon-chain
 RUN install_packages bash
