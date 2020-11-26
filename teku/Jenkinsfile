@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                checkout scm
+                dir('teku') {                     
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target teku -t stereum/teku:${RELEASE}-soft .'
+                }
+            }
+        }
+        stage('Push') {
+            steps {                                
+                sh 'docker push stereum/teku:${RELEASE}-soft'                                
+            }
+        }
+        stage('Hardening') {
+            steps {                                                
+                build job: 'teku-harden', parameters: [[$class: 'StringParameterValue', name: 'RELEASE', value: RELEASE] ], propagate: false, wait: false
+            }
+        }
+    }
+    post { 
+        always { 
+            cleanWs()
+        }
+    }
+}

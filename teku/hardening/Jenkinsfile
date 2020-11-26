@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+    stages {        
+        stage('Harden') {
+            steps {
+                parallel(
+                    "beacon-chain": {
+                        dir('teku/hardening') { 
+                            sh 'docker build -f Dockerfile --target beacon-chain --build-arg=RELEASE=${RELEASE} -t stereum/teku:${RELEASE} .'
+                            sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy --exit-code 0 --severity CRITICAL,HIGH,LOW --no-progress stereum/teku:${RELEASE}"
+                            sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy --exit-code 8 --severity CRITICAL --no-progress stereum/teku:${RELEASE}"
+                        }
+                    }                    
+                )
+            }
+            
+        }
+        stage('Push Hardened') {
+            
+            steps {                
+                sh 'docker push stereum/teku:${RELEASE}'                                   
+            }
+        }
+    }
+    post { 
+        always { 
+            cleanWs()
+        }
+    }
+}
