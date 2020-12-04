@@ -12,6 +12,9 @@ pipeline {
         }
         stage('Push Hardened') {
             steps {                
+                when {                
+                    expression { params.SKIP_PUSH == 'false' }
+                }
                 sh 'docker push stereum/beacon-base:${BASE}'
             }
         }

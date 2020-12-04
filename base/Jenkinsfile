@@ -10,13 +10,16 @@ pipeline {
             }
         }
         stage('Push') {
+            when {                
+                    expression { params.SKIP_PUSH == 'false' }
+            }
             steps {                
                 sh 'docker push stereum/beacon-base:${BASE}-soft'                
             }
         }
-        stage('Hardening') {
+        stage('Hardening') {            
             steps {                                                
-                build job: 'beacon-base-harden', parameters: [[$class: 'StringParameterValue', name: 'BASE', value: BASE]], propagate: false, wait: false
+                build job: 'beacon-base-harden', parameters: [[$class: 'StringParameterValue', name: 'BASE', value: BASE],[$class: 'StringParameterValue', name: 'SKIP_PUSH', value: SKIP_PUSH]], propagate: false, wait: false
             }
         }
     }
