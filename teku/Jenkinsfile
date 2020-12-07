@@ -4,7 +4,7 @@ pipeline {
         stage('Build') {
             steps {
                 checkout scm
-                dir('teku') {                     
+                dir('teku') {
                     sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target teku -t stereum/teku:${RELEASE}-soft .'
                 }
             }
