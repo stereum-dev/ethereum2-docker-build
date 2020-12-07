@@ -3,7 +3,7 @@ pipeline {
     stages {        
         stage('Harden') {
             steps {                                    
-                sh '/opt/docker-slim/docker-slim build --target stereum/teku:${RELEASE}-soft --tag stereum/teku:${RELEASE}-slim --http-probe=false'                                            
+                sh "/opt/docker-slim/docker-slim build --target stereum/teku:${RELEASE}-soft --tag stereum/teku:${RELEASE}-slim --http-probe=false"
             }
             
         }
@@ -12,14 +12,14 @@ pipeline {
                 // do breaking scan for critical issues
                 sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy --exit-code 8 --severity CRITICAL --no-progress stereum/teku:${RELEASE}-slim"
                 // do a non-breaking scan and save the results to store it in docker file 
-                dir('teku') {   
-                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy -o scan_report_$(date +%F).log --exit-code 0 --severity CRITICAL,HIGH,LOW --no-progress stereum/teku:${RELEASE}-slim"
+                dir('teku') {                       
+                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy -o scan_report.log --exit-code 0 --severity CRITICAL,HIGH,LOW --no-progress stereum/teku:${RELEASE}-slim"
                 }        
             }            
         }
         stage('Push Hardened') {            
             steps {                
-                sh 'echo docker push stereum/teku:${RELEASE}'                                   
+                sh "echo docker push stereum/teku:${RELEASE}"
             }
         }
     }
