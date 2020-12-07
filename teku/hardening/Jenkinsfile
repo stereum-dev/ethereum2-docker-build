@@ -3,7 +3,7 @@ pipeline {
     stages {        
         stage('Harden') {
             steps {                                    
-                sh "/opt/docker-slim/docker-slim build --target stereum/teku:${RELEASE}-soft --tag stereum/teku:${RELEASE}-slim --http-probe=false"
+                sh "/opt/docker-slim/dist_linux/docker-slim build --target stereum/teku:${RELEASE}-soft --tag stereum/teku:${RELEASE}-slim --http-probe=false"
             }
             
         }
