@@ -5,7 +5,7 @@ pipeline {
             steps {
                 checkout scm
                 dir('base') { 
-                    sh 'docker build  --build-arg=BASE=${BASE} -t stereum/beacon-base:${BASE}-soft .'                    
+                    sh 'docker build  --build-arg=BASE=${BASE} -t stereum/beacon-base:${BASE} .'                    
                 }
             }
         }
@@ -14,14 +14,9 @@ pipeline {
                     expression { params.SKIP_PUSH == 'false' }
             }
             steps {                
-                sh 'docker push stereum/beacon-base:${BASE}-soft'                
+                sh 'docker push stereum/beacon-base:${BASE}'                
             }
-        }
-        stage('Hardening') {            
-            steps {                                                
-                build job: 'beacon-base-harden', parameters: [[$class: 'StringParameterValue', name: 'BASE', value: BASE],[$class: 'StringParameterValue', name: 'SKIP_PUSH', value: SKIP_PUSH]], propagate: false, wait: false
-            }
-        }
+        }        
     }
     post { 
         always { 
