@@ -3,7 +3,7 @@ FROM stereum/beacon-base:${BEACON_BASE} as builder
 LABEL maintainer="theguys@stereum.net"
 ARG RELEASE
 RUN : "${RELEASE:?Build argument needs to be set and non-empty.}"
-RUN install_packages bash build-essential make g++ git
+RUN install_packages bash build-essential ca-certificates make g++ git
 WORKDIR /tmp/build
 RUN git clone https://github.com/status-im/nimbus-eth2.git nimbus
 WORKDIR /tmp/build/nimbus
