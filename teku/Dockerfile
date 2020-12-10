@@ -5,7 +5,7 @@ LABEL maintainer="theguys@stereum.net"
 ARG RELEASE
 RUN : "${RELEASE:?Build argument needs to be set and non-empty.}"
 WORKDIR /tmp/build
-RUN install_packages wget bash unzip && \  
+RUN install_packages ca-certificates wget bash unzip && \  
   wget -q "https://bintray.com/consensys/pegasys-repo/download_file?file_path=teku-${RELEASE}.zip" -O "teku-${RELEASE}.zip" && \  
   unzip teku-${RELEASE}.zip
 

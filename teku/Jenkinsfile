@@ -1,22 +1,53 @@
 pipeline {
     agent any
-    stages {
+    stages {        
         stage('Build') {
+            // Build image, output is stereum/${IMAGE}:${RELEASE}-build
             steps {
                 checkout scm
-                dir('teku') {
-                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target teku -t stereum/teku:${RELEASE}-soft .'
+                dir(${IMAGE}) {
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} -t stereum/${IMAGE}:${RELEASE}-build .'
                 }
             }
         }
-        stage('Push') {
-            steps {                                
-                sh 'docker push stereum/teku:${RELEASE}-soft'                                
+        stage('Shrink') {
+            // Shrink image using docker-slim, output is stereum/${IMAGE}:${RELEASE}-slim 
+            steps {                                    
+                sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/${IMAGE}:${RELEASE}"
+                sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-build"
+            }
+            
+        }
+        stage('Scan') {
+            // Scan the shrinked image and put the scan report in the final image named stereum/$IMAGE:$TAG-soft
+            steps {
+                dir(${IMAGE}) {   
+                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy -o scan_report.log --exit-code 0 --severity CRITICAL,HIGH,LOW --no-progress stereum/${IMAGE}:${RELEASE}-slim"
+                    sh "docker build --build-arg=IMAGE=stereum/teku:${RELEASE} -f /var/jenkins_home/docker-slim/scan_report.yml -t stereum/${IMAGE}:${RELEASE}-soft ."
+                    sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-slim"
+                }
+            }   
+        }
+        stage('Push Soft') {            
+            // push the soft image to dockerhub
+            steps {                
+                sh 'docker push stereum/${IMAGE}:${RELEASE}-soft'                                   
             }
         }
-        stage('Hardening') {
-            steps {                                                
-                build job: 'teku-harden', parameters: [[$class: 'StringParameterValue', name: 'RELEASE', value: RELEASE] ], propagate: false, wait: false
+        stage('Push Secured Image') {            
+            // do a breaking rescan, push the image only if we are free of critical issues
+            steps {          
+                script {
+                    def RESULT = sh returnStatus: true, script: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy -o scan_report.log --exit-code 8 --severity CRITICAL --no-progress stereum/${IMAGE}:${RELEASE}-slim"
+                    if ( RESULT != 0 ) {
+                        unstable("There are CVEs marked as critical, skip pushing hard image")
+                    } else {
+                        sh 'docker tag stereum/${IMAGE}:${RELEASE}-soft stereum/${IMAGE}:${RELEASE}'                                       
+                        sh 'docker push stereum/${IMAGE}:${RELEASE}'                                       
+                        sh "docker rmi -f stereum/${IMAGE}:${RELEASE}"
+                        sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-soft"
+                    }
+                }
             }
         }
     }
