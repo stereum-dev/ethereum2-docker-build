@@ -11,50 +11,24 @@ pipeline {
             }
         }
         stage('Shrink') {
-            // Shrink image using docker-slim, output is stereum/${IMAGE}:${RELEASE}-slim 
+            // Shrink image using docker-slim, output is stereum/${IMAGE}:${RELEASE} 
             steps {                                    
                 sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/${IMAGE}:${RELEASE}"
                 sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-build"
             }
             
         }
-        stage('Scan') {
-            // Scan the shrinked image and put the scan report in the final image named stereum/$IMAGE:$TAG-soft
-            steps {
-                dir("${IMAGE}") {   
-                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /var/jenkins_home/.trivy:/root/.cache/ -v ${WORKSPACE}:/workspace aquasec/trivy -o /workspace/scan_report.log --exit-code 0 --severity CRITICAL,HIGH,LOW --no-progress stereum/${IMAGE}:${RELEASE}-slim"
-                    sh "cp /var/jenkins_home/docker-slim/scanreport.yaml ."
-                    sh "docker build --build-arg=IMAGE=stereum/${IMAGE}:${RELEASE}-slim -f ./scanreport.yaml -t stereum/${IMAGE}:${RELEASE}-soft ."
-                    sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-slim"
-                }
-            }   
-        }
-        stage('Push Soft') {            
-            // push the soft image to dockerhub
+        stage('Push') {            
+            // push image to dockerhub
             steps {                
-                sh 'docker push stereum/${IMAGE}:${RELEASE}-soft'                                   
-            }
-        }
-        stage('Push Secured Image') {            
-            // do a breaking rescan, push the image only if we are free of critical issues
-            steps {          
-                script {
-                    def RESULT = sh returnStatus: true, script: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /var/jenkins_home/.trivy:/root/.cache/ aquasec/trivy -o scan_report.log --exit-code 8 --severity CRITICAL --no-progress stereum/${IMAGE}:${RELEASE}-slim"
-                    if ( RESULT != 0 ) {
-                        unstable("There are CVEs marked as critical, skip pushing hard image")
-                    } else {
-                        sh 'docker tag stereum/${IMAGE}:${RELEASE}-soft stereum/${IMAGE}:${RELEASE}'                                       
-                        sh 'docker push stereum/${IMAGE}:${RELEASE}'                                       
-                        sh "docker rmi -f stereum/${IMAGE}:${RELEASE}"
-                        sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-soft"
-                    }
-                }
+                sh 'docker push stereum/${IMAGE}:${RELEASE}'                                   
+                sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}'                                   
             }
         }
     }
-    //post { 
-        //always { 
-        //    cleanWs()
-        //}
-    //}
+    post { 
+        always { 
+            cleanWs()
+        }
+    }
 }
