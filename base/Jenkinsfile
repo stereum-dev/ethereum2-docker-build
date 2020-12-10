@@ -11,10 +11,12 @@ pipeline {
         }
         stage('Push') {
             when {                
-                    expression { params.SKIP_PUSH == 'false' }
+                expression { params.SKIP_PUSH == 'false' }
             }
             steps {                
                 sh 'docker push stereum/beacon-base:${BASE}'                
+                sh 'docker tag stereum/beacon-base:${BASE} stereum/beacon-base:${TAG}'                
+                sh 'docker push stereum/beacon-base:${TAG}'                
             }
         }        
     }
