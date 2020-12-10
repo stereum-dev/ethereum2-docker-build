@@ -1,22 +1,28 @@
 pipeline {
     agent any
-    stages {
+    stages {        
         stage('Build') {
+            // Build image, output is stereum/${IMAGE}:${RELEASE}-build
             steps {
                 checkout scm
-                dir('lighthouse') {                     
-                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target lighthouse -t stereum/lighthouse:${RELEASE}-soft .'
+                dir("${IMAGE}") {
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} -t stereum/${IMAGE}:${RELEASE}-build .'
                 }
             }
         }
-        stage('Push') {
-            steps {                                
-                sh 'docker push stereum/lighthouse:${RELEASE}-soft'                                
+        stage('Shrink') {
+            // Shrink image using docker-slim, output is stereum/${IMAGE}:${RELEASE} 
+            steps {                                    
+                sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/${IMAGE}:${RELEASE}"
+                sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-build"
             }
+            
         }
-        stage('Hardening') {
-            steps {                                                
-                build job: 'lighthouse-harden', parameters: [[$class: 'StringParameterValue', name: 'RELEASE', value: RELEASE] ], propagate: false, wait: false
+        stage('Push') {            
+            // push image to dockerhub
+            steps {                
+                sh 'docker push stereum/${IMAGE}:${RELEASE}'                                   
+                sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}'                                   
             }
         }
     }
