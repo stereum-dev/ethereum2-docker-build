@@ -5,7 +5,7 @@ LABEL maintainer="theguys@stereum.net"
 ARG RELEASE
 RUN : "${RELEASE:?Build argument needs to be set and non-empty.}"
 WORKDIR /tmp/build
-RUN install_packages wget bash && \  
+RUN install_packages wget ca-certificates bash && \  
   wget -q https://github.com/sigp/lighthouse/releases/download/${RELEASE}/lighthouse-${RELEASE}-x86_64-unknown-linux-gnu.tar.gz -O lighthouse-${RELEASE}-x86_64-unknown-linux-gnu.tar.gz && \  
   tar xzf lighthouse-${RELEASE}-x86_64-unknown-linux-gnu.tar.gz
 
