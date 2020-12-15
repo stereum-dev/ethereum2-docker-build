@@ -18,7 +18,7 @@ pipeline {
                 sh "docker rmi -f stereum/prysm-beacon-chain:${RELEASE}-build"
                 sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/prysm-slasher:${RELEASE}"
                 sh "docker rmi -f stereum/prysm-slasher:${RELEASE}-build"
-                sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/validator:${RELEASE}"
+                sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/prysm-validator:${RELEASE}"
                 sh "docker rmi -f stereum/validator:${RELEASE}-build"
             }
             
