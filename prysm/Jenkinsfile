@@ -5,24 +5,34 @@ pipeline {
             steps {
                 checkout scm
                 dir('prysm') {                     
-                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target beacon-chain -t stereum/prysm-beacon-chain:${RELEASE}-soft .'
-                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target slasher -t stereum/prysm-slasher:${RELEASE}-soft .'
-                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target validator -t stereum/prysm-validator:${RELEASE}-soft .'
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target beacon-chain -t stereum/prysm-beacon-chain:${RELEASE}-build .'
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target slasher -t stereum/prysm-slasher:${RELEASE}-build .'
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --target validator -t stereum/prysm-validator:${RELEASE}-build .'
                 }
             }
         }
+        stage('Shrink') {
+            // Shrink image using docker-slim, output is stereum/${IMAGE}:${RELEASE} 
+            steps {                                    
+                sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/prysm-beacon-chain:${RELEASE}"
+                sh "docker rmi -f stereum/prysm-beacon-chain:${RELEASE}-build"
+                sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/prysm-slasher:${RELEASE}"
+                sh "docker rmi -f stereum/prysm-slasher:${RELEASE}-build"
+                sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/validator:${RELEASE}"
+                sh "docker rmi -f stereum/validator:${RELEASE}-build"
+            }
+            
+        }        
         stage('Push') {
             steps {                                
-                sh 'docker push stereum/prysm-beacon-chain:${RELEASE}-soft'                
-                sh 'docker push stereum/prysm-slasher:${RELEASE}-soft'
-                sh 'docker push stereum/prysm-validator:${RELEASE}-soft'
+                sh 'docker push stereum/prysm-beacon-chain:${RELEASE}'
+                sh 'docker rmi -f stereum/prysm-beacon-chain:${RELEASE}'
+                sh 'docker push stereum/prysm-slasher:${RELEASE}'
+                sh 'docker rmi -f stereum/prysm-slasher:${RELEASE}'
+                sh 'docker push stereum/prysm-validator:${RELEASE}'
+                sh 'docker rmi -f stereum/prysm-validator:${RELEASE}'
             }
-        }
-        stage('Hardening') {
-            steps {                                                
-                build job: 'prysm-harden', parameters: [[$class: 'StringParameterValue', name: 'RELEASE', value: RELEASE] ], propagate: false, wait: false
-            }
-        }
+        }        
     }
     post { 
         always { 
