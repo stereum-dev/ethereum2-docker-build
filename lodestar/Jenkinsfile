@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+    stages {        
+        stage('Build') {
+            // Build image, output is stereum/${IMAGE}:${RELEASE}-build
+            steps {
+                checkout scm
+                dir("${IMAGE}") {
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} -t stereum/${IMAGE}:${RELEASE}-build .'
+                }
+            }
+        }
+        stage('Shrink') {
+            // Shrink image using docker-slim, output is stereum/${IMAGE}:${RELEASE} 
+            steps {                                    
+                sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/${IMAGE}:${RELEASE}"
+                sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-build"
+            }
+            
+        }
+        stage('Push') {            
+            // push image to dockerhub
+            steps {                
+                sh 'docker push stereum/${IMAGE}:${RELEASE}'                                   
+                sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}'                                   
+            }
+        }
+    }
+    post { 
+        always { 
+            cleanWs()
+        }
+    }
+}
