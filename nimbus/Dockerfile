@@ -23,6 +23,6 @@ COPY --from=builder /tmp/build/nimbus/scripts scripts
 # create user
 RUN adduser --home ${SERVICE_HOME} --shell /sbin/nologin --uid 2000 ${SERVICE_USER} && \
   chown -R ${SERVICE_USER}:${SERVICE_USER} ${SERVICE_HOME}
-RUN chmod +x ${SERVICE_HOME}/scripts/run-beacon-node.sh
+RUN chmod +x ${SERVICE_HOME}/build/nimbus_beacon_node
 USER ${SERVICE_USER}
-ENTRYPOINT ["/opt/app/scripts/run-beacon-node.sh"]
+ENTRYPOINT ["/opt/app/build/nimbus_beacon_node"]
