@@ -18,9 +18,6 @@ ARG SERVICE_DATA_DIR
 ENV SERVICE_USER ${SERVICE_USER:-app}
 ENV SERVICE_HOME ${SERVICE_HOME:-/opt/${SERVICE_USER}}
 ENV SERVICE_DATA_DIR ${SERVICE_DATA_DIR:-${SERVICE_HOME}/data}
-WORKDIR ${SERVICE_DATA_DIR}
-RUN chown -R ${SERVICE_USER}:${SERVICE_USER} ${SERVICE_DATA_DIR}
-RUN chmod 700 ${SERVICE_DATA_DIR}
 WORKDIR ${SERVICE_HOME}
 # copy binaries
 COPY --from=builder /tmp/build/nimbus/build build
@@ -29,5 +26,9 @@ COPY --from=builder /tmp/build/nimbus/scripts scripts
 RUN adduser --home ${SERVICE_HOME} --shell /sbin/nologin --uid 2000 ${SERVICE_USER} && \
   chown -R ${SERVICE_USER}:${SERVICE_USER} ${SERVICE_HOME}
 RUN chmod +x ${SERVICE_HOME}/build/nimbus_beacon_node
+WORKDIR ${SERVICE_DATA_DIR}
+RUN chown -R ${SERVICE_USER}:${SERVICE_USER} ${SERVICE_DATA_DIR}
+RUN chmod 700 ${SERVICE_DATA_DIR}
+WORKDIR ${SERVICE_HOME}
 USER ${SERVICE_USER}
 ENTRYPOINT ["/opt/app/build/nimbus_beacon_node"]
