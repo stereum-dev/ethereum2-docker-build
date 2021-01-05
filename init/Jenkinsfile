@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                checkout scm
+                dir('init') { 
+                    sh 'docker build  --build-arg=BEACON_BASE=${BASE} -t stereum/init:${BASE} .'
+                }
+            }
+        }
+        stage('Push') {
+            when {                
+                expression { params.SKIP_PUSH == 'false' }
+            }
+            steps {                
+                sh 'docker push stereum/init:${BASE}'                
+                sh 'docker tag stereum/init:${BASE} stereum/init:${TAG}'                
+                sh 'docker push stereum/init:${TAG}'                
+            }
+        }        
+    }
+    post { 
+        always { 
+            cleanWs()
+        }
+    }
+}
