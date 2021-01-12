@@ -11,4 +11,5 @@ RUN adduser --home ${SERVICE_HOME} --shell /sbin/nologin --uid 2000 ${SERVICE_US
   chown -R ${SERVICE_USER}:${SERVICE_USER} ${SERVICE_HOME} /mnt
 WORKDIR ${SERVICE_HOME}
 COPY startup.sh .
+RUN chmod +x /opt/app/startup.sh
 ENTRYPOINT [ "/opt/app/startup.sh" ]
