@@ -8,7 +8,7 @@ WORKDIR /tmp/build
 RUN git clone https://github.com/status-im/nimbus-eth2.git nimbus
 WORKDIR /tmp/build/nimbus
 RUN git checkout tags/${RELEASE} -b releasebuild
-RUN make -j4
+RUN make NIMFLAGS="-d:insecure" -j4
 
 FROM stereum/beacon-base:${BEACON_BASE} as soft-nimbus
 RUN install_packages bash
