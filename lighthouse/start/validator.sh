@@ -5,4 +5,5 @@
      --network $NETWORK \
      validator \
      --beacon-nodes http://beacon:5052 \
+     --datadir "$DATADIR" \
      --init-slashing-protection
