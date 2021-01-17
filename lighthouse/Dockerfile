@@ -18,9 +18,13 @@ ENV SERVICE_HOME ${SERVICE_HOME:-/opt/${SERVICE_USER}}
 WORKDIR ${SERVICE_HOME}
 # copy binaries
 COPY --from=builder /tmp/build/lighthouse lighthouse
+# copy start scripts
+COPY start/ start/
 # create user
 RUN adduser --home ${SERVICE_HOME} --shell /sbin/nologin --uid 2000 ${SERVICE_USER} && \
   chown -R ${SERVICE_USER}:${SERVICE_USER} ${SERVICE_HOME}
 RUN chmod +x ${SERVICE_HOME}/lighthouse
+RUN chmod +x ${SERVICE_HOME}/start/beacon.sh
+RUN chmod +x ${SERVICE_HOME}/start/validator.sh
 USER ${SERVICE_USER}
 ENTRYPOINT ["/opt/app/lighthouse"]
