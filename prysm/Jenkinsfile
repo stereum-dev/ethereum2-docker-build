@@ -22,17 +22,34 @@ pipeline {
                 sh "docker rmi -f stereum/validator:${RELEASE}-build"
             }
             
-        }        
-        stage('Push') {
-            steps {                                
+        }                
+        stage('Push') {            
+            // push image to dockerhub
+            steps {                
                 sh 'docker push stereum/prysm-beacon-chain:${RELEASE}'
-                sh 'docker rmi -f stereum/prysm-beacon-chain:${RELEASE}'
+                sh 'docker tag stereum/prysm-beacon-chain:${RELEASE}-${BUILD_NUMBER}'
+                sh 'docker push stereum/prysm-beacon-chain:${RELEASE}-${BUILD_NUMBER}'
+                
                 sh 'docker push stereum/prysm-slasher:${RELEASE}'
-                sh 'docker rmi -f stereum/prysm-slasher:${RELEASE}'
+                sh 'docker tag stereum/prysm-slasher:${RELEASE}-${BUILD_NUMBER}'
+                sh 'docker push stereum/prysm-slasher:${RELEASE}-${BUILD_NUMBER}'
+
                 sh 'docker push stereum/prysm-validator:${RELEASE}'
-                sh 'docker rmi -f stereum/prysm-validator:${RELEASE}'
+                sh 'docker tag stereum/prysm-validator:${RELEASE}-${BUILD_NUMBER}'
+                sh 'docker push stereum/prysm-validator:${RELEASE}-${BUILD_NUMBER}'
             }
-        }        
+        }
+        stage('Cleanup') {                        
+            // cleanup local images
+            steps {                                
+                sh 'docker rmi -f stereum/prysm-beacon-chain:${RELEASE}'
+                sh 'docker rmi -f stereum/prysm-beacon-chain:${RELEASE}-${BUILD_NUMBER}'
+                sh 'docker rmi -f stereum/prysm-slasher:${RELEASE}'
+                sh 'docker rmi -f stereum/prysm-slasher:${RELEASE}-${BUILD_NUMBER}'
+                sh 'docker rmi -f stereum/prysm-validator:${RELEASE}'
+                sh 'docker rmi -f stereum/prysm-validator:${RELEASE}-${BUILD_NUMBER}'
+            }
+        }
     }
     post { 
         always { 

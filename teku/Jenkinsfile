@@ -21,8 +21,16 @@ pipeline {
         stage('Push') {            
             // push image to dockerhub
             steps {                
-                sh 'docker push stereum/${IMAGE}:${RELEASE}'                                   
-                sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}'                                   
+                sh 'docker push stereum/${IMAGE}:${RELEASE}'
+                sh 'docker tag stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
+                sh 'docker push stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'                
+            }
+        }
+        stage('Cleanup') {                        
+            // cleanup local images
+            steps {                                
+                sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}'
+                sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
             }
         }
     }
