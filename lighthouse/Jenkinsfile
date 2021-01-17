@@ -20,10 +20,10 @@ pipeline {
         }
         stage('Push') {            
             // push image to dockerhub
-            steps {                
-                sh 'docker push stereum/${IMAGE}:${RELEASE}'
-                sh 'docker tag stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
+            steps {                                
+                sh 'docker tag stereum/${IMAGE}:${RELEASE} stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
                 sh 'docker push stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'                
+                sh 'docker push stereum/${IMAGE}:${RELEASE}'
             }
         }
         stage('Cleanup') {                        
