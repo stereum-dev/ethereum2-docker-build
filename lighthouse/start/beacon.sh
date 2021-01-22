@@ -10,4 +10,5 @@
   --http-address 0.0.0.0 \
   --metrics \
   --metrics-address 0.0.0.0 \
-  --disable-upnp
+  --disable-upnp \
+  --validator-monitor-auto
