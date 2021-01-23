@@ -3,6 +3,10 @@ def RELEASE = BUILD_TIMESTAMP
 pipeline {
     agent any    
 
+    environment {
+       RELEASE = BUILD_TIMESTAMP
+    }
+
     stages {        
         stage('Build') {
             // Build image, output is stereum/${IMAGE}:${RELEASE}-build
