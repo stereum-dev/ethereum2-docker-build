@@ -1,43 +1,38 @@
-def RELEASE = BUILD_TIMESTAMP
 
 pipeline {
     agent any    
 
-    environment {
-       RELEASE = BUILD_TIMESTAMP
-    }
-
     stages {        
         stage('Build') {
-            // Build image, output is stereum/${IMAGE}:${RELEASE}-build
+            // Build image, output is stereum/${IMAGE}:${TIMESTAMP}-build
             steps {
                 checkout scm                
                 dir("${IMAGE}") {
-                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} -t stereum/${IMAGE}:${RELEASE}-build .'
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} -t stereum/${IMAGE}:${BUILD_TIMESTAMP}-build .'
                 }
             }
         }
         stage('Shrink') {
-            // Shrink image using docker-slim, output is stereum/${IMAGE}:${RELEASE} 
+            // Shrink image using docker-slim, output is stereum/${IMAGE}:${BUILD_TIMESTAMP} 
             steps {                                    
-                sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/${IMAGE}:${RELEASE}"
-                sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-build"
+                sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/${IMAGE}:${BUILD_TIMESTAMP}"
+                sh "docker rmi -f stereum/${IMAGE}:${BUILD_TIMESTAMP}-build"
             }
             
         }
         stage('Push') {            
             // push image to dockerhub
             steps {                
-                sh 'docker tag stereum/${IMAGE}:${RELEASE} stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
-                sh 'docker push stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'                
-                sh 'docker push stereum/${IMAGE}:${RELEASE}'                
+                sh 'docker tag stereum/${IMAGE}:${BUILD_TIMESTAMP} stereum/${IMAGE}:${BUILD_TIMESTAMP}-${BUILD_NUMBER}'
+                sh 'docker push stereum/${IMAGE}:${BUILD_TIMESTAMP}-${BUILD_NUMBER}'                
+                sh 'docker push stereum/${IMAGE}:${BUILD_TIMESTAMP}'                
             }
         }
         stage('Cleanup') {                        
             // cleanup local images
             steps {                                
-                sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}'
-                sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
+                sh 'docker rmi -f stereum/${IMAGE}:${BUILD_TIMESTAMP}'
+                sh 'docker rmi -f stereum/${IMAGE}:${BUILD_TIMESTAMP}-${BUILD_NUMBER}'
             }
         }
     }
