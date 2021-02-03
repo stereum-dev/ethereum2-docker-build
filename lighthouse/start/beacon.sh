@@ -11,4 +11,6 @@
   --metrics \
   --metrics-address 0.0.0.0 \
   --disable-upnp \
-  --validator-monitor-auto
+  --validator-monitor-auto \
+  --slasher \
+  --slasher-dir "$SLASHERDIR"
