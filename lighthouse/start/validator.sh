@@ -6,4 +6,5 @@
      validator \
      --beacon-nodes http://beacon:5052 \
      --datadir "$DATADIR" \
-     --init-slashing-protection
+     --init-slashing-protection \
+     --graffiti "$GRAFFITI"
