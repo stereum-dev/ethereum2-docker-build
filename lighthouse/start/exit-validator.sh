@@ -5,4 +5,4 @@
      --network $NETWORK \
      account validator exit \
      --keystore "$LAUNCHPADDIR" \
-     --beacon-nodes "$BEACONNODE" 
+     --beacon-node "$BEACONNODE" 
