@@ -13,7 +13,7 @@ RUN cargo build --release
 
 
 FROM stereum/beacon-base:${BEACON_BASE} as harmony
-RUN install_packages bash openjdk-11-jre
+RUN install_packages bash openjdk-11-jre ca-certificates
 ARG RELEASE
 ARG SERVICE_USER
 ARG SERVICE_HOME

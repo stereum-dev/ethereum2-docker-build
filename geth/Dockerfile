@@ -10,7 +10,7 @@ RUN install_packages wget ca-certificates bash && \
   tar xzf geth-linux-amd64-${RELEASE}.tar.gz
 
 FROM stereum/beacon-base:${BEACON_BASE} as geth
-RUN install_packages bash
+RUN install_packages bash ca-certificates
 ARG RELEASE
 ARG SERVICE_USER
 ARG SERVICE_HOME

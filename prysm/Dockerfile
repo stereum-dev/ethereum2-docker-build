@@ -11,7 +11,7 @@ RUN install_packages ca-certificates wget bash && \
   wget -q https://github.com/prysmaticlabs/prysm/releases/download/${RELEASE}/validator-${RELEASE}-linux-amd64 -O validator
 
 FROM stereum/beacon-base:${BEACON_BASE} as beacon-chain
-RUN install_packages bash
+RUN install_packages bash ca-certificates
 ARG SERVICE_USER
 ARG SERVICE_HOME
 ENV SERVICE_USER ${SERVICE_USER:-app}
@@ -27,7 +27,7 @@ USER ${SERVICE_USER}
 ENTRYPOINT ["/opt/app/beacon-chain"]
 
 FROM stereum/beacon-base:${BEACON_BASE} as slasher
-RUN install_packages bash
+RUN install_packages bash ca-certificates
 ARG SERVICE_USER
 ARG SERVICE_HOME
 ENV SERVICE_USER ${SERVICE_USER:-app}
@@ -43,7 +43,7 @@ USER ${SERVICE_USER}
 ENTRYPOINT ["/opt/app/slasher"]
 
 FROM stereum/beacon-base:${BEACON_BASE} as validator
-RUN install_packages bash
+RUN install_packages bash ca-certificates
 ARG SERVICE_USER
 ARG SERVICE_HOME
 ENV SERVICE_USER ${SERVICE_USER:-app}

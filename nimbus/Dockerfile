@@ -11,7 +11,7 @@ RUN git checkout tags/${RELEASE} -b releasebuild
 RUN make NIMFLAGS="-d:insecure" nimbus_beacon_node
 
 FROM stereum/beacon-base:${BEACON_BASE} as soft-nimbus
-RUN install_packages bash
+RUN install_packages bash ca-certificates
 ARG SERVICE_USER
 ARG SERVICE_HOME
 ARG SERVICE_DATA_DIR

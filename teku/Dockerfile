@@ -10,7 +10,7 @@ RUN install_packages ca-certificates wget bash unzip && \
   unzip teku-${RELEASE}.zip
 
 FROM stereum/beacon-base:${BEACON_BASE} as teku
-RUN install_packages bash openjdk-11-jre
+RUN install_packages bash openjdk-11-jre ca-certificates
 ARG RELEASE
 ARG SERVICE_USER
 ARG SERVICE_HOME

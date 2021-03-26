@@ -10,7 +10,7 @@ RUN install_packages wget ca-certificates bash && \
   tar xzf lighthouse-${RELEASE}-x86_64-unknown-linux-gnu.tar.gz
 
 FROM stereum/beacon-base:${BEACON_BASE} as lighthouse
-RUN install_packages bash curl ca-certificates
+RUN install_packages bash ca-certificates
 ARG SERVICE_USER
 ARG SERVICE_HOME
 ENV SERVICE_USER ${SERVICE_USER:-app}
@@ -26,6 +26,7 @@ RUN adduser --home ${SERVICE_HOME} --shell /sbin/nologin --uid 2000 ${SERVICE_US
 RUN chmod +x ${SERVICE_HOME}/lighthouse
 RUN chmod +x ${SERVICE_HOME}/start/beacon.sh
 RUN chmod +x ${SERVICE_HOME}/start/validator.sh
+RUN chmod +x ${SERVICE_HOME}/start/exit-validator.sh
 RUN chmod +x ${SERVICE_HOME}/start/import-launchpad-wallet.sh
 USER ${SERVICE_USER}
 ENTRYPOINT ["/opt/app/lighthouse"]
