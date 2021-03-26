@@ -10,7 +10,7 @@ RUN install_packages wget ca-certificates bash && \
   tar xzf lighthouse-${RELEASE}-x86_64-unknown-linux-gnu.tar.gz
 
 FROM stereum/beacon-base:${BEACON_BASE} as lighthouse
-RUN install_packages bash curl
+RUN install_packages bash curl libcurl4
 ARG SERVICE_USER
 ARG SERVICE_HOME
 ENV SERVICE_USER ${SERVICE_USER:-app}
