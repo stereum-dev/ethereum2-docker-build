@@ -5,6 +5,7 @@
   --network $NETWORK \
   beacon \
   --eth1-endpoints "$ETH1_NODE" \
+  --eth1-blocks-per-log-query "150" \
   --datadir "$DATADIR" \
   --http \
   --http-address 0.0.0.0 \
