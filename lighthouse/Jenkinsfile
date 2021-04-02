@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    stages {        
+    stages {
         stage('Build') {
             // Build image, output is stereum/${IMAGE}:${RELEASE}-build
             steps {
@@ -8,29 +8,44 @@ pipeline {
                 dir("${IMAGE}") {
                     sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} -t stereum/${IMAGE}:${RELEASE}-build .'
                 }
+                dir("${IMAGE}") {
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --build-arg=PORTABLE=yes -t stereum/${IMAGE}:${RELEASE}-portable-build .'
+                }
             }
         }
         stage('Shrink') {
-            // Shrink image using docker-slim, output is stereum/${IMAGE}:${RELEASE} 
-            steps {                                    
+            // Shrink image using docker-slim, output is stereum/${IMAGE}:${RELEASE}
+            steps {
                 sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/${IMAGE}:${RELEASE}"
                 sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-build"
             }
-            
-        }
-        stage('Push') {            
-            // push image to dockerhub
-            steps {                                
-                sh 'docker tag stereum/${IMAGE}:${RELEASE} stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
-                sh 'docker push stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'                
-                sh 'docker push stereum/${IMAGE}:${RELEASE}'
+            steps {
+                sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/${IMAGE}:${RELEASE}-portable"
+                sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-portable-build"
             }
         }
-        stage('Cleanup') {                        
+        stage('Push') {
+            // push image to dockerhub
+            steps {
+                sh 'docker tag stereum/${IMAGE}:${RELEASE} stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
+                sh 'docker push stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
+                sh 'docker push stereum/${IMAGE}:${RELEASE}'
+            }
+            steps {
+                sh 'docker tag stereum/${IMAGE}:${RELEASE}-portable stereum/${IMAGE}:${RELEASE}-portable-${BUILD_NUMBER}'
+                sh 'docker push stereum/${IMAGE}:${RELEASE}-portable-${BUILD_NUMBER}'
+                sh 'docker push stereum/${IMAGE}:${RELEASE}-portable'
+            }
+        }
+        stage('Cleanup') {
             // cleanup local images
-            steps {                                
+            steps {
                 sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}'
                 sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
+            }
+            steps {
+                sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}-portable'
+                sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}-portable-${BUILD_NUMBER}'
             }
         }
     }

@@ -1,13 +1,15 @@
 ARG BEACON_BASE
+ARG PORTABLE
 
 FROM stereum/beacon-base:${BEACON_BASE} as builder
 LABEL maintainer="theguys@stereum.net"
 ARG RELEASE
 RUN : "${RELEASE:?Build argument needs to be set and non-empty.}"
 WORKDIR /tmp/build
-RUN install_packages wget ca-certificates bash && \  
-  wget -q https://github.com/sigp/lighthouse/releases/download/${RELEASE}/lighthouse-${RELEASE}-x86_64-unknown-linux-gnu.tar.gz -O lighthouse-${RELEASE}-x86_64-unknown-linux-gnu.tar.gz && \  
-  tar xzf lighthouse-${RELEASE}-x86_64-unknown-linux-gnu.tar.gz
+RUN install_packages wget ca-certificates bash && \
+  if [[ "$PORTABLE" == "yes" ]]; then wget -q https://github.com/sigp/lighthouse/releases/download/${RELEASE}/lighthouse-${RELEASE}-x86_64-unknown-linux-gnu-portable.tar.gz -O lighthouse-${RELEASE}-x86_64-unknown-linux-gnu-portable.tar.gz && tar xzf lighthouse-${RELEASE}-x86_64-unknown-linux-gnu-portable.tar.gz \
+  else wget -q https://github.com/sigp/lighthouse/releases/download/${RELEASE}/lighthouse-${RELEASE}-x86_64-unknown-linux-gnu.tar.gz -O lighthouse-${RELEASE}-x86_64-unknown-linux-gnu.tar.gz && tar xzf lighthouse-${RELEASE}-x86_64-unknown-linux-gnu.tar.gz \
+  fi
 
 FROM stereum/beacon-base:${BEACON_BASE} as lighthouse
 RUN install_packages bash ca-certificates
