@@ -7,9 +7,7 @@ pipeline {
                 checkout scm
                 dir("${IMAGE}") {
                     sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} -t stereum/${IMAGE}:${RELEASE}-build .'
-                }
-                dir("${IMAGE}") {
-                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} --build-arg=PORTABLE=yes -t stereum/${IMAGE}:${RELEASE}-portable-build .'
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=PORTABLE=true --build-arg=RELEASE=${RELEASE} -t stereum/${IMAGE}:${RELEASE}-portable-build .'
                 }
             }
         }
@@ -18,11 +16,10 @@ pipeline {
             steps {
                 sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/${IMAGE}:${RELEASE}"
                 sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-build"
-            }
-            steps {
                 sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/${IMAGE}:${RELEASE}-portable"
                 sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-portable-build"
             }
+
         }
         stage('Push') {
             // push image to dockerhub
@@ -30,8 +27,7 @@ pipeline {
                 sh 'docker tag stereum/${IMAGE}:${RELEASE} stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
                 sh 'docker push stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
                 sh 'docker push stereum/${IMAGE}:${RELEASE}'
-            }
-            steps {
+
                 sh 'docker tag stereum/${IMAGE}:${RELEASE}-portable stereum/${IMAGE}:${RELEASE}-portable-${BUILD_NUMBER}'
                 sh 'docker push stereum/${IMAGE}:${RELEASE}-portable-${BUILD_NUMBER}'
                 sh 'docker push stereum/${IMAGE}:${RELEASE}-portable'
@@ -42,8 +38,6 @@ pipeline {
             steps {
                 sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}'
                 sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
-            }
-            steps {
                 sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}-portable'
                 sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}-portable-${BUILD_NUMBER}'
             }
