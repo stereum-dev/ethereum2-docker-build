@@ -6,8 +6,8 @@ pipeline {
             steps {
                 checkout scm
                 dir("${IMAGE}") {
-                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=PORTABLE=false --build-arg=RELEASE=${RELEASE} -t stereum/${IMAGE}:${RELEASE}-build .'
-                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=PORTABLE=true --build-arg=RELEASE=${RELEASE} -t stereum/${IMAGE}:${RELEASE}-portable-build .'
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} -t stereum/${IMAGE}:${RELEASE}-build .'
+                    sh 'docker build -f Dockerfile --build-arg=BEACON_BASE=${BASE} --build-arg=RELEASE=${RELEASE} -t stereum/${IMAGE}:${RELEASE}-portable-build -f Dockerfile-portable .'
                 }
             }
         }
