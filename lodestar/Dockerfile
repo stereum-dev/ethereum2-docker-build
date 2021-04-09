@@ -30,8 +30,8 @@ WORKDIR ${SERVICE_HOME}
 # copy binaries
 COPY --from=builder /tmp/build/lodestar/packages packages
 COPY --from=builder /tmp/build/lodestar/node_modules node_modules
-RUN ln -s packages/lodestar-cli/bin/lodestar lodestar
-# create user
+RUN ln -s packages/cli/bin/lodestar lodestar
+## create user
 RUN adduser --home ${SERVICE_HOME} --shell /sbin/nologin --uid 2000 ${SERVICE_USER} && \
   chown -R ${SERVICE_USER}:${SERVICE_USER} ${SERVICE_HOME}
 RUN chmod +x ${SERVICE_HOME}/lodestar
