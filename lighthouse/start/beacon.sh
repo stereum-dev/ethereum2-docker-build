@@ -14,4 +14,5 @@
   --disable-upnp \
   --validator-monitor-auto \
   --slasher \
-  --slasher-dir "$SLASHERDIR"
+  --slasher-dir "$SLASHERDIR" \
+  --slasher-max-db-size $SLASHER_DB_SIZE
