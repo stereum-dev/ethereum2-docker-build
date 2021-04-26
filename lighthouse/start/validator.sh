@@ -7,4 +7,6 @@
      --beacon-nodes http://beacon:5052 \
      --datadir "$DATADIR" \
      --init-slashing-protection \
-     --graffiti "$GRAFFITI"
+     --graffiti "$GRAFFITI" \
+     --metrics \
+     --metrics-address 0.0.0.0
