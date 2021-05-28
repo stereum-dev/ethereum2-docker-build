@@ -4,7 +4,7 @@
   --debug-level $DEBUG_LEVEL \
   --network $NETWORK \
   beacon \
-  --eth1-endpoints "$ETH1_NODE" \
+  --eth1-endpoints $ETH1_NODES \
   --eth1-blocks-per-log-query "150" \
   --datadir "$DATADIR" \
   --http \
