@@ -19,7 +19,7 @@ RUN yarn install --ignore-optional && yarn run build && yarn install --productio
 FROM stereum/beacon-base:${BEACON_BASE} as lodestar
 RUN install_packages curl ca-certificates && \
   apt-get -y update && \
-  curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
+  curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
   install_packages nodejs bash
 ARG RELEASE
 ARG SERVICE_USER
