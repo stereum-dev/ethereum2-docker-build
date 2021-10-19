@@ -7,7 +7,7 @@ RUN : "${RELEASE:?Build argument needs to be set and non-empty.}"
 WORKDIR /tmp/build
 RUN install_packages curl wget ca-certificates bash git g++ make python2.7 && \  
   apt-get -y update && \
-  curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
+  curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
   install_packages nodejs
 RUN npm install -g yarn pkg
 RUN git clone https://github.com/chainsafe/lodestar.git
