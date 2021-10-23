@@ -11,24 +11,23 @@ pipeline {
             }
         }
         stage('Shrink') {
-            // Shrink image using docker-slim, output is stereum/${IMAGE}:${RELEASE} 
-            steps {                                    
+            // Shrink image using docker-slim, output is stereum/${IMAGE}:${RELEASE}
+            steps {
                 sh "/var/jenkins_home/docker-slim/docker-slim.sh stereum/${IMAGE}:${RELEASE}"
                 sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-build"
             }
-            
         }
-        stage('Push') {            
+        stage('Push') {
             // push image to dockerhub
-            steps {                
+            steps {
+                sh 'docker push stereum/${IMAGE}:${RELEASE}'
                 sh 'docker tag stereum/${IMAGE}:${RELEASE} stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
-                sh 'docker push stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'                
-                sh 'docker push stereum/${IMAGE}:${RELEASE}'                
+                sh 'docker push stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
             }
         }
-        stage('Cleanup') {                        
+        stage('Cleanup') {
             // cleanup local images
-            steps {                                
+            steps {
                 sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}'
                 sh 'docker rmi -f stereum/${IMAGE}:${RELEASE}-${BUILD_NUMBER}'
             }
