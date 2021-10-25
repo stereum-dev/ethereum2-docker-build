@@ -10,6 +10,7 @@ pipeline {
                 }
             }
         }
+        /*
         stage('Shrink') {
             // Shrink image using docker-slim, output is stereum/${IMAGE}:${RELEASE}
             steps {
@@ -17,6 +18,7 @@ pipeline {
                 sh "docker rmi -f stereum/${IMAGE}:${RELEASE}-build"
             }
         }
+        */
         stage('Push') {
             // push image to dockerhub
             steps {
