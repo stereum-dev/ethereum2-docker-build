@@ -1,7 +1,7 @@
-#!/bin/bashi
+#!/bin/bash
 
 set -o xtrace
-set -v
+set -o verbose
 
 opt_app_lighthouse="/opt/app/lighthouse"
 account_validator_import="account validator import" 
