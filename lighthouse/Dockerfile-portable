@@ -27,6 +27,7 @@ RUN adduser --home ${SERVICE_HOME} --shell /sbin/nologin --uid 2000 ${SERVICE_US
 RUN chmod +x ${SERVICE_HOME}/lighthouse
 RUN chmod +x ${SERVICE_HOME}/start/beacon.sh
 RUN chmod +x ${SERVICE_HOME}/start/validator.sh
+RUN chmod +x ${SERVICE_HOME}/start/validator-stereum2.sh
 RUN chmod +x ${SERVICE_HOME}/start/exit-validator.sh
 RUN chmod +x ${SERVICE_HOME}/start/import-launchpad-wallet.sh
 USER ${SERVICE_USER}
